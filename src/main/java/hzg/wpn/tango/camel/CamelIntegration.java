@@ -11,15 +11,11 @@ import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.RoutesDefinition;
 import org.slf4j.MDC;
 import org.tango.DeviceState;
-import org.tango.server.ChangeEventPusher;
 import org.tango.server.ServerManager;
-import org.tango.server.ServerManagerUtils;
-import org.tango.server.StateChangeEventPusher;
 import org.tango.server.annotation.*;
 import org.tango.server.device.DeviceManager;
 import org.tango.utils.DevFailedUtils;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -30,9 +26,9 @@ import java.util.List;
 public class CamelIntegration {
     @DeviceManagement
     private DeviceManager deviceManager;
-    @State(isPolled = true)
+    @State(isPolled = true, pollingPeriod = 3000)
     private volatile DeviceState state;
-    @Status(isPolled = true)
+    @Status(isPolled = true, pollingPeriod = 3000)
     private volatile String status;
 
     public void setDeviceManager(DeviceManager deviceManager) {
@@ -42,7 +38,6 @@ public class CamelIntegration {
     private CamelContext camelContext;
 
     @Init
-    @StateMachine(endState = DeviceState.ON)
     public void init() throws Exception {
 
         SimpleRegistry registry = new SimpleRegistry();
@@ -58,13 +53,14 @@ public class CamelIntegration {
                 .process(exchange -> {
                     MDC.setContextMap(deviceManager.getDevice().getMdcContextMap());
                     DevFailed exception = (DevFailed) exchange.getProperty(Exchange.EXCEPTION_CAUGHT);
-                    setState(DeviceState.ALARM);
-                    setStatus(DevFailedUtils.toString(exception));
+                    deviceManager.pushStateChangeEvent(DeviceState.ALARM);
+                    deviceManager.pushStatusChangeEvent(DevFailedUtils.toString(exception));
                 }));
 
 
         List<RouteDefinition> routes = routeDefinition.getRoutes();
         camelContext.addRouteDefinitions(routes);
+        deviceManager.pushStateChangeEvent(DeviceState.ON);
     }
 
     @Attribute
@@ -80,27 +76,27 @@ public class CamelIntegration {
     }
 
     @Command
-    @StateMachine(endState = DeviceState.RUNNING)
     public void start() throws Exception {
         camelContext.start();
-        setStatus("STARTED");
+        deviceManager.pushStateChangeEvent(DeviceState.RUNNING);
+        deviceManager.pushStatusChangeEvent("STARTED");
     }
 
     @Command
-    @StateMachine(endState = DeviceState.ON)
     public void stop() throws Exception {
         camelContext.stop();
-        setStatus("STOPPED");
+        deviceManager.pushStateChangeEvent(DeviceState.ON);
+        deviceManager.pushStatusChangeEvent("STOPPED");
     }
 
     @Delete
     public void delete() throws Exception {
         stop();
+        deviceManager.pushStateChangeEvent(DeviceState.OFF);
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         ServerManager.getInstance().start(args, CamelIntegration.class);
-        ServerManagerUtils.writePidFile(null);
     }
 
     public DeviceState getState() {
@@ -109,7 +105,6 @@ public class CamelIntegration {
 
     public void setState(DeviceState state) {
         this.state = state;
-        new StateChangeEventPusher(state, deviceManager).run();
     }
 
     public String getStatus() {
@@ -117,7 +112,6 @@ public class CamelIntegration {
     }
 
     public void setStatus(String status) {
-        this.status = status;
-        new ChangeEventPusher<>("Status", status, deviceManager).run();
+        this.status = String.format("%d: %s", System.currentTimeMillis(), status);
     }
 }
