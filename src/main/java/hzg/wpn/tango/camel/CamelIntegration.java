@@ -6,9 +6,11 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Route;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.impl.SimpleRegistry;
+import org.apache.camel.model.ModelCamelContext;
+import org.apache.camel.model.ModelHelper;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.RoutesDefinition;
+import org.apache.camel.support.SimpleRegistry;
 import org.slf4j.MDC;
 import org.tango.DeviceState;
 import org.tango.server.ServerManager;
@@ -46,7 +48,7 @@ public class CamelIntegration {
         camelContext = new DefaultCamelContext(registry);
 
 
-        RoutesDefinition routeDefinition = camelContext.loadRoutesDefinition(
+        RoutesDefinition routeDefinition = ModelHelper.loadRoutesDefinition(camelContext,
                 ResourceManager.loadResource("etc/CamelIntegration","routes.xml"));
 
         routeDefinition.getRoutes().forEach(routeDefinition1 -> routeDefinition1.onException(DevFailed.class)
@@ -59,14 +61,16 @@ public class CamelIntegration {
 
 
         List<RouteDefinition> routes = routeDefinition.getRoutes();
-        camelContext.addRouteDefinitions(routes);
+
+        ((ModelCamelContext) camelContext).addRouteDefinitions(routes);
         deviceManager.pushStateChangeEvent(DeviceState.ON);
+        deviceManager.pushStatusChangeEvent("Camel has been initialized");
     }
 
     @Attribute
     public String[] getRouteDefinitions(){
         return
-                camelContext.getRouteDefinitions().stream().map(RouteDefinition::getId).toArray(String[]::new);
+                ((ModelCamelContext) camelContext).getRouteDefinitions().stream().map(RouteDefinition::getId).toArray(String[]::new);
     }
 
     @Attribute
