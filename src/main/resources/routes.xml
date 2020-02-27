@@ -2,7 +2,7 @@
     <!-- here we define the bar route -->
     <route id="status_server_0">
         <from uri="tango://hzgxenvtest:10000/test/status_server/status_server?pipe=status_server_pipe&amp;poll=true"/>
-        <to uri="tango://hzgxenvtest:10000/development/dfs/0?pipe=pipe"/>
+        <to uri="tango://hzgxenvtest:10000/test/dfs/0?pipe=pipe"/>
     </route>
 
     <!-- PreExperimentDataCollector route id must contain predator keyword-->
