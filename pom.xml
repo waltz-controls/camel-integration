@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>hzg.wpn.xenv</groupId>
+    <groupId>de.hzg.wpi.xenv</groupId>
     <artifactId>CamelIntegration</artifactId>
     <version>2.2-SNAPSHOT</version>
 
@@ -20,19 +20,19 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.tango-controls</groupId>
-            <artifactId>tango-camel-component</artifactId>
-            <version>2.1</version>
+            <groupId>de.hereon.tango</groupId>
+            <artifactId>camel-component</artifactId>
+            <version>2.2</version>
         </dependency>
         <dependency>
-            <groupId>hzg.wpn</groupId>
+            <groupId>de.hereon</groupId>
             <artifactId>utils</artifactId>
-            <version>21</version>
+            <version>22</version>
         </dependency>
         <dependency>
-            <groupId>org.tango-controls</groupId>
-            <artifactId>JTangoServer</artifactId>
-            <version>9.5.18-hzg.7</version>
+            <groupId>de.hereon.tango</groupId>
+            <artifactId>server</artifactId>
+            <version>1.0.1</version>
         </dependency>
     </dependencies>
 
@@ -149,16 +149,8 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-            <id>bintray-hzg</id>
-            <url>http://dl.bintray.com/hzgde/hzg-wpn-projects</url>
-        </repository>
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>bintray-tango-controls</id>
-            <name>bintray</name>
-            <url>https://dl.bintray.com/tango-controls/maven</url>
+            <id>github-hzg</id>
+            <url>https://maven.pkg.github.com/hzg-wpi/*</url>
         </repository>
     </repositories>
 </project>
