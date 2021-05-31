@@ -9,6 +9,8 @@
     <properties>
         <github.organization>hzg-wpi</github.organization>
         <github.repo>camel-integration</github.repo>
+        <dockerhub.username>hzhereon</dockerhub.username>
+        <dockerhub.repo>camel-integration</dockerhub.repo>
     </properties>
 
     <scm>
@@ -32,7 +34,7 @@
         <dependency>
             <groupId>de.hereon.tango</groupId>
             <artifactId>server</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.5</version>
         </dependency>
     </dependencies>
 
@@ -48,6 +50,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>jar-distribution</id>
@@ -78,6 +81,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
                 <configuration>
                     <skip>true</skip>
                 </configuration>
@@ -85,6 +89,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -96,10 +101,34 @@
             </plugin>
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.2</version>
                 <configuration>
                     <localCheckout>true</localCheckout>
                     <useReleaseProfile>true</useReleaseProfile>
                     <releaseProfiles>release</releaseProfiles>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+                <version>1.4.12</version>
+                <executions>
+                    <execution>
+                        <id>default</id>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>push</goal>
+                        </goals>
+                        <phase>deploy</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <repository>registry.hub.docker.com/${dockerhub.username}/${dockerhub.repo}</repository>
+                    <tag>latest</tag>
+                    <buildArgs>
+                        <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
+                    </buildArgs>
+                    <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
                 </configuration>
             </plugin>
         </plugins>
@@ -110,6 +139,29 @@
             <id>release</id>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>com.spotify</groupId>
+                        <artifactId>dockerfile-maven-plugin</artifactId>
+                        <version>1.4.12</version>
+                        <executions>
+                            <execution>
+                                <id>default</id>
+                                <goals>
+                                    <goal>build</goal>
+                                    <goal>push</goal>
+                                </goals>
+                                <phase>deploy</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <repository>registry.hub.docker.com/${dockerhub.username}/${dockerhub.repo}</repository>
+                            <tag>${project.version}</tag>
+                            <buildArgs>
+                                <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
+                            </buildArgs>
+                            <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>de.jutzig</groupId>
                         <artifactId>github-release-plugin</artifactId>
