@@ -25,6 +25,12 @@
             <groupId>de.hereon.tango</groupId>
             <artifactId>camel-component</artifactId>
             <version>2.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>de.hereon.tango.lang</groupId>
+                    <artifactId>client</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>de.hereon</groupId>
