@@ -7,7 +7,7 @@
     <version>2.4-SNAPSHOT</version>
 
     <properties>
-        <github.organization>hzg-wpi</github.organization>
+        <github.organization>hereon-wpi</github.organization>
         <github.repo>camel-integration</github.repo>
         <dockerhub.username>hzhereon</dockerhub.username>
         <dockerhub.repo>camel-integration</dockerhub.repo>
@@ -24,7 +24,7 @@
         <dependency>
             <groupId>de.hereon.tango</groupId>
             <artifactId>camel-component</artifactId>
-            <version>2.2</version>
+            <version>2.4</version>
             <exclusions>
                 <exclusion>
                     <groupId>de.hereon.tango.lang</groupId>
